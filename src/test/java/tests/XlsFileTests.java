@@ -1,16 +1,14 @@
 package tests;
 
-import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 
-import static com.codeborne.pdftest.PDF.containsText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static utils.Files.*;
+import static utils.Files.getXls;
+import static utils.Files.readXlsxFromPath;
 
 public class XlsFileTests {
     @Test

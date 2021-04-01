@@ -4,14 +4,11 @@ import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 
 public class Files {
     public static String readTextFromFile(File file) throws IOException {
@@ -34,7 +31,7 @@ public class Files {
         return new XLS(getFile(path));
     }
 
-    public static String readXlsxFromPath(String path){
+    public static String readXlsxFromPath(String path) {
         StringBuilder sb = new StringBuilder();
 
         try (FileInputStream fis = new FileInputStream(path);
