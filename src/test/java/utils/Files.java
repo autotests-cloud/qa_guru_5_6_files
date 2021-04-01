@@ -3,17 +3,12 @@ package utils;
 import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 
 public class Files {
     public static String readTextFromFile(File file) throws IOException {
@@ -36,50 +31,43 @@ public class Files {
         return new XLS(getFile(path));
     }
 
-    public static String readXlsxFromPath(String path){
-        String result = "";
-        XSSFWorkbook myExcelBook = null;
+    public static String readXlsxFromPath(String path) {
+        StringBuilder sb = new StringBuilder();
 
-        try {
-            myExcelBook = new XSSFWorkbook(new FileInputStream(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        try (FileInputStream fis = new FileInputStream(path);
+             Workbook myExcelBook = WorkbookFactory.create(fis)) {
 
-        XSSFSheet myExcelSheet = myExcelBook.getSheetAt(0);
-        Iterator<Row> rows = myExcelSheet.iterator();
+            for (Sheet sheet : myExcelBook) {
+                sb.append("Sheet ").append(sheet.getSheetName()).append(":\n");
+                for (Row row : sheet) {
+                    for (Cell cell : row) {
+                        CellType cellType = cell.getCellType();
+                        switch (cellType) {
+                            case STRING:
+                                sb.append(cell.getStringCellValue());
+                                break;
 
-        while (rows.hasNext()) {
-            Row row = rows.next();
-            Iterator<Cell> cells = row.iterator();
-            while (cells.hasNext()) {
-                Cell cell = cells.next();
-                CellType cellType = cell.getCellType();
-                //перебираем возможные типы ячеек
-                switch (cellType) {
-//                    case Cell.CELL_TYPE_STRING:
-//                        result += cell.getStringCellValue() + "=";
-//                        break;
-//                    case Cell.CELL_TYPE_NUMERIC:
-//                        result += "[" + cell.getNumericCellValue() + "]";
-//                        break;
-//
-//                    case Cell.CELL_TYPE_FORMULA:
-//                        result += "[" + cell.getNumericCellValue() + "]";
-//                        break;
-                    default:
-                        result += cell.toString();
-                        break;
+                            case NUMERIC:
+                                sb.append("[").append(cell.getNumericCellValue()).append("]");
+                                break;
+
+                            case FORMULA:
+                                sb.append("{").append(cell.getCellFormula()).append(cell.getNumericCellValue()).append("}");
+
+                                break;
+                            default:
+                                sb.append(cell.toString());
+                                break;
+                        }
+                        sb.append(" ");
+                    }
+                    sb.append("\n");
                 }
             }
-        }
-
-        try {
-            myExcelBook.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return result;
+        return sb.toString();
     }
 }
